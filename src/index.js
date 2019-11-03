@@ -158,7 +158,7 @@ const keyUpEvent = (event) => {
   if (!!button) {
     button.classList.remove(selectedButtonClass);
   }
-  keyboard.elements.keys[0].cli
+  button.click();
 };
 
 const keyDownEvent = (event) => {
