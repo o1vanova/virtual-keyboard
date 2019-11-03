@@ -1,0 +1,69 @@
+* {
+  box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0; }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+  user-select: none;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #24292e;
+  background-color: #24292e; }
+
+.wrapper {
+  height: 100vh;
+  width: 800px;
+  margin: 0 auto;
+  padding: 10px;
+  overflow-x: auto;
+  overflow-y: auto;
+  background-color: #fff; }
+
+.textarea {
+  width: 100%;
+  height: 90px;
+  overflow: auto;
+  resize: none;
+  outline: none;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  padding: 10px; }
+
+.keyboard {
+  width: 100%;
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; }
+  .keyboard__row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; }
+  .keyboard__button {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    border-radius: 5px;
+    color: #24292e;
+    border: 1px solid #cfcfcf;
+    background-color: #cfcfcf;
+    outline: none; }
+    .keyboard__button:hover {
+      background-color: #24292e;
+      color: #fff;
+      opacity: .5; }
+    .keyboard__button--active {
+      background-color: #24292e;
+      color: #fff;
+      border: 1px solid #000;
+      box-shadow: 0px 0px 5px #4c4c4a; }
+    .keyboard__button--long {
+      width: 80px; }
+    .keyboard__button--max {
+      width: 500px; }
+

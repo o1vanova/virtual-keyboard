@@ -71,8 +71,8 @@ const keyboard = {
           case 8:
             btn.textContent = button.en;
             const backSpaceClicked = () => {
-              let value = this.properties.textarea.value;
-              this.properties.textarea.value = value.substring(0, value.length - 1);
+              let value = this.elements.textarea.value;
+              this.elements.textarea.value = value.substring(0, value.length - 1);
             };
             btn.addEventListener("click", backSpaceClicked);
             break;
