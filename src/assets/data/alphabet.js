@@ -1,4 +1,4 @@
-export const data = [
+const data = [
   [
     { code: 192, en: '`' },
     { code: 49, en: '1' },
@@ -13,7 +13,7 @@ export const data = [
     { code: 48, en: '0' },
     { code: 189, en: '-' },
     { code: 187, en: '=' },
-    { code: 8, en: 'Backspace' }
+    { code: 8, en: 'Backspace' },
   ],
   [
     { code: 9, en: 'Tab' },
@@ -28,7 +28,7 @@ export const data = [
     { code: 79, en: 'o', ru: 'щ' },
     { code: 80, en: 'p', ru: 'з' },
     { code: 219, en: '[' },
-    { code: 221, en: ']' }
+    { code: 221, en: ']' },
   ],
   [
     { code: 20, en: 'Caps Lock' },
@@ -43,7 +43,7 @@ export const data = [
     { code: 76, en: 'l', ru: 'д' },
     { code: 186, en: ';', ru: 'ж' },
     { code: 222, en: '\'', ru: 'э' },
-    { code: 13, en: 'Enter' }
+    { code: 13, en: 'Enter' },
   ],
   [
     { code: 16, en: 'Shift' },
@@ -56,12 +56,14 @@ export const data = [
     { code: 77, en: 'm', ru: 'ь' },
     { code: 188, en: ',', ru: 'б' },
     { code: 190, en: '.', ru: 'ю' },
-    { code: 191, en: '/', ru: '.' }
+    { code: 191, en: '/', ru: '.' },
   ],
   [
     { code: 17, en: 'Ctrl' },
     { code: 18, en: 'Alt' },
     { code: 32, en: 'Space' },
-    { code: 0, en: 'Lang' }
-  ]
+    { code: 0, en: 'Lang' },
+  ],
 ];
+
+export default data;

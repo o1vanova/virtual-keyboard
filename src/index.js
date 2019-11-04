@@ -1,24 +1,33 @@
 import './site.scss';
-import { data } from './assets/data/alphabet';
+import data from './assets/data/alphabet';
 
 const keyboard = {
   elements: {
     root: null,
     textarea: null,
     keyboard: null,
-    keys: []     
+    keys: [],
   },
 
   properties: {
-    languages: ['en', 'ru'],
     currentLang: null,
-    capsLock: false
+    capsLock: false,
+  },
+
+  constants: {
+    letterCodes: [
+      65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76,
+      77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88,
+      89, 90, 186, 222],
+    ru: 'ru',
+    en: 'en',
+    languages: ['ru', 'en'],
   },
 
   init() {
     let defaultLang = localStorage.getItem('lang');
     if (!defaultLang) {
-      defaultLang = this.properties.languages[0];
+      defaultLang = this.constants.en;
       localStorage.setItem('lang', defaultLang);
     }
     this.properties.currentLang = defaultLang;
@@ -31,7 +40,7 @@ const keyboard = {
     this.elements.keyboard = document.createElement('div');
     this.elements.keyboard.classList.add('keyboard');
     this.elements.keyboard.appendChild(this.setKeys());
-    this.elements.keys = this.elements.keyboard.querySelectorAll(".keyboard__button");
+    this.elements.keys = this.elements.keyboard.querySelectorAll('.keyboard__button');
 
     this.elements.root.appendChild(this.elements.textarea);
     this.elements.root.appendChild(this.elements.keyboard);
@@ -39,10 +48,10 @@ const keyboard = {
 
   setKeys() {
     const fragment = document.createDocumentFragment();
-    const longButtons = [ 8, 9, 20, 16, 17, 18, 13, 0 ];
-    const maxButtons = [ 32 ];
+    const longButtons = [8, 9, 20, 16, 17, 18, 13, 0];
+    const maxButtons = [32];
 
-    data.forEach((row, index) => {
+    data.forEach((row) => {
       const rowElement = document.createElement('div');
       rowElement.classList.add('keyboard__row');
 
@@ -57,11 +66,11 @@ const keyboard = {
         }
 
         btn.setAttribute('id', button.code);
-        
+
         switch (button.code) {
           case 0:
-            btn.textContent = button.en; 
-            btn.addEventListener("click", () => this.changeLang());
+            btn.textContent = button.en;
+            btn.addEventListener('click', () => this.changeLang());
             break;
           case 16:
           case 17:
@@ -70,51 +79,52 @@ const keyboard = {
             break;
           case 8:
             btn.textContent = button.en;
-            const backSpaceClicked = () => {
-              let value = this.elements.textarea.value;
+            btn.addEventListener('click', () => {
+              const { value } = this.elements.textarea;
               this.elements.textarea.value = value.substring(0, value.length - 1);
-            };
-            btn.addEventListener("click", backSpaceClicked);
+            });
             break;
           case 13:
             btn.textContent = button.en;
-            const enterClicked = () => {
+            btn.addEventListener('click', () => {
               this.elements.textarea.value += '\n';
-            };
-            btn.addEventListener("click", enterClicked);
+            });
             break;
           case 20:
             btn.textContent = button.en;
-            const capsLockClicked = () => {
+            btn.addEventListener('click', () => {
               this.toggleCapsLock();
-              btn.classList.toggle("keyboard__button--active", this.properties.capsLock);
-            };
-            btn.addEventListener("click", capsLockClicked);
+              btn.classList.toggle('keyboard__button--active', this.properties.capsLock);
+            });
             break;
           case 9:
           case 32:
             btn.textContent = button.en;
-            const spaceClicked = () => {
-              this.elements.textarea.value += button.code === 0 ? '   ' : ' ';
-            };
-            btn.addEventListener("click", spaceClicked);
+            btn.addEventListener('click', () => {
+              this.elements.textarea.value += button.code === 9 ? '   ' : ' ';
+            });
             break;
           default:
-            let letter = (button.code > 64 && button.code < 91) || [186, 222].includes(button.code) ?
-              this.properties.currentLang === this.properties.languages[0] ?
-                button.en : button.ru : button.en;
+            if (this.constants.letterCodes.includes(button.code)) {
+              btn.textContent = this.properties.currentLang === this.constants.en
+                ? button.en : button.ru;
+            } else {
+              btn.textContent = button.en;
+            }
 
-            btn.textContent = letter.toLowerCase();
             btn.setAttribute('data-en', button.en);
             btn.setAttribute('data-ru', button.ru);
-            const buttonClicked = () => {
-              let code = (button.code > 64 && button.code < 91) || [186, 222].includes(button.code) ?
-              this.properties.currentLang === this.properties.languages[0] ?
-                button.en : button.ru : button.en;
-              this.elements.textarea.value += this.properties.capsLock ? code.toUpperCase() : code.toLowerCase();;
-            };
 
-            btn.addEventListener("click", buttonClicked);
+            btn.addEventListener('click', () => {
+              let code = button.en;
+              if (this.constants.letterCodes.includes(button.code)) {
+                code = this.properties.currentLang === this.constants.en
+                  ? button.en : button.ru;
+              }
+
+              this.elements.textarea.value += this.properties.capsLock
+                ? code.toUpperCase() : code.toLowerCase();
+            });
             break;
         }
 
@@ -127,35 +137,41 @@ const keyboard = {
   },
 
   changeLang() {
-    this.properties.currentLang = this.properties.currentLang === this.properties.languages[0] ?
-      this.properties.languages[1] : this.properties.languages[0];
+    this.properties.currentLang = this.properties.currentLang === this.constants.en
+      ? this.constants.ru : this.constants.en;
     localStorage.setItem('lang', this.properties.currentLang);
 
-    for (const key of this.elements.keys) {
-      if ((+key.id > 64 && +key.id < 91) || [186, 222].includes(+key.id)) {
-        key.textContent = this.properties.currentLang === this.properties.languages[0] ?
-          key.dataset.en : key.dataset.ru;
+    this.elements.keys.forEach((key) => {
+      const btn = key;
+      if (this.constants.letterCodes.includes(+btn.id)) {
+        const code = this.properties.currentLang === this.constants.en
+          ? btn.dataset.en : btn.dataset.ru;
+        btn.textContent = this.properties.capsLock
+          ? code.toUpperCase() : code.toLowerCase();
       }
-    }
+    });
   },
 
   toggleCapsLock() {
     this.properties.capsLock = !this.properties.capsLock;
-    const controlButtons = [ 8, 9, 20, 16, 17, 18, 13, 32, 0];
+    const controlButtons = [8, 9, 20, 16, 17, 18, 13, 32, 0];
 
-    for (const key of this.elements.keys) {
+    this.elements.keys.forEach((key) => {
       if (!controlButtons.includes(+key.id)) {
-        key.textContent = this.properties.capsLock ? key.textContent.toUpperCase() : key.textContent.toLowerCase();
+        const btn = key;
+        btn.textContent = this.properties.capsLock
+          ? btn.textContent.toUpperCase()
+          : btn.textContent.toLowerCase();
       }
-    }
-  }
+    });
+  },
 };
 
 const selectedButtonClass = 'keyboard__button--active';
 
 const keyUpEvent = (event) => {
   const button = document.getElementById(event.keyCode);
-  if (!!button) {
+  if (button) {
     button.classList.remove(selectedButtonClass);
   }
   button.click();
@@ -168,6 +184,6 @@ const keyDownEvent = (event) => {
   }
 };
 
-window.addEventListener("DOMContentLoaded", () => keyboard.init());
-window.addEventListener("keyup", keyUpEvent, false);
-window.addEventListener("keydown", keyDownEvent, false);
+window.addEventListener('DOMContentLoaded', () => keyboard.init());
+window.addEventListener('keyup', keyUpEvent, false);
+window.addEventListener('keydown', keyDownEvent, false);

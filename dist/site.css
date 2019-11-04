@@ -57,6 +57,9 @@ body {
       background-color: #24292e;
       color: #fff;
       opacity: .5; }
+    .keyboard__button:active {
+      box-shadow: 0 0 5px #24292e;
+      opacity: 1; }
     .keyboard__button--active {
       background-color: #24292e;
       color: #fff;
