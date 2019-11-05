@@ -173,8 +173,8 @@ const keyUpEvent = (event) => {
   const button = document.getElementById(event.keyCode);
   if (button) {
     button.classList.remove(selectedButtonClass);
+    button.click();
   }
-  button.click();
 };
 
 const keyDownEvent = (event) => {
