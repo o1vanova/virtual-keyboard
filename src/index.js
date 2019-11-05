@@ -75,6 +75,9 @@ const keyboard = {
             btn.addEventListener('click', () => this.changeLang());
             break;
           case 16:
+            btn.addEventListener('click', () => {
+              this.drawButtons();
+            });
             break;
           case 17:
           case 18:
@@ -104,7 +107,7 @@ const keyboard = {
             break;
           default:
             if (!this.constants.controlCodes.includes(button.code)) {
-              if (this.properties.capsLock) {
+              if (this.properties.capsLock || this.properties.shiftLock) {
                 btn.textContent = this.isEng() ? button.shift.en : button.shift.ru;
               } else {
                 btn.textContent = this.isEng() ? button.simple.en : button.simple.ru;
@@ -119,7 +122,7 @@ const keyboard = {
             btn.addEventListener('click', () => {
               let code = button.simple.en;
               if (!this.constants.controlCodes.includes(button.code)) {
-                if (this.properties.capsLock) {
+                if (this.properties.capsLock || this.properties.shiftLock) {
                   code = this.isEng() ? btn.dataset.shiftEn : btn.dataset.shiftRu;
                 } else {
                   code = this.isEng() ? btn.dataset.simpleEn : btn.dataset.simpleRu;
@@ -145,7 +148,7 @@ const keyboard = {
     this.elements.keys.forEach((key) => {
       const btn = key;
       if (!this.constants.controlCodes.includes(+btn.id)) {
-        if (this.properties.capsLock) {
+        if (this.properties.capsLock || this.properties.shiftLock) {
           btn.textContent = this.isEng() ? btn.dataset.shiftEn : btn.dataset.shiftRu;
         } else {
           btn.textContent = this.isEng() ? btn.dataset.simpleEn : btn.dataset.simpleRu;
@@ -156,11 +159,14 @@ const keyboard = {
 
   toggleCapsLock() {
     this.properties.capsLock = !this.properties.capsLock;
-    const controlButtons = [8, 9, 20, 16, 17, 18, 13, 32, 0];
+    this.drawButtons();
+  },
+
+  drawButtons() {
     this.elements.keys.forEach((key) => {
-      if (!controlButtons.includes(+key.id)) {
+      if (!this.constants.controlCodes.includes(+key.id)) {
         const btn = key;
-        if (this.properties.capsLock) {
+        if (this.properties.capsLock || this.properties.shiftLock) {
           btn.textContent = this.isEng() ? btn.dataset.shiftEn : btn.dataset.shiftRu;
         } else {
           btn.textContent = this.isEng() ? btn.dataset.simpleEn : btn.dataset.simpleRu;
@@ -178,12 +184,21 @@ const keyUpEvent = (event) => {
   const button = document.getElementById(event.keyCode);
   if (button && event.keyCode !== 20) {
     button.classList.remove(selectedButtonClass);
+
+    if (event.keyCode === 16) {
+      keyboard.properties.shiftLock = false;
+      button.click();
+    }
   }
 };
 
 const keyDownEvent = (event) => {
   const button = document.getElementById(event.keyCode);
   if (button) {
+    if (event.keyCode === 16) {
+      keyboard.properties.shiftLock = true;
+    }
+
     button.click();
 
     if (!button.classList.contains(selectedButtonClass) && event.keyCode !== 20) {
