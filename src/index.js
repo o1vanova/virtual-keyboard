@@ -1,6 +1,8 @@
 import './site.scss';
 import data from './assets/data/alphabet';
 
+const selectedButtonClass = 'keyboard__button--active';
+
 const keyboard = {
   elements: {
     root: null,
@@ -12,13 +14,11 @@ const keyboard = {
   properties: {
     currentLang: null,
     capsLock: false,
+    shiftLock: false,
   },
 
   constants: {
-    letterCodes: [
-      65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76,
-      77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88,
-      89, 90, 186, 222],
+    controlCodes: [0, 8, 9, 13, 16, 17, 18, 20, 32],
     ru: 'ru',
     en: 'en',
     languages: ['ru', 'en'],
@@ -66,64 +66,66 @@ const keyboard = {
         }
 
         btn.setAttribute('id', button.code);
+        if (this.constants.controlCodes.includes(button.code)) {
+          btn.textContent = button.name;
+        }
 
         switch (button.code) {
           case 0:
-            btn.textContent = button.en;
             btn.addEventListener('click', () => this.changeLang());
             break;
           case 16:
+            break;
           case 17:
           case 18:
-            btn.textContent = button.en;
             break;
           case 8:
-            btn.textContent = button.en;
             btn.addEventListener('click', () => {
               const { value } = this.elements.textarea;
               this.elements.textarea.value = value.substring(0, value.length - 1);
             });
             break;
           case 13:
-            btn.textContent = button.en;
             btn.addEventListener('click', () => {
               this.elements.textarea.value += '\n';
             });
             break;
           case 20:
-            btn.textContent = button.en;
             btn.addEventListener('click', () => {
               this.toggleCapsLock();
-              btn.classList.toggle('keyboard__button--active', this.properties.capsLock);
+              btn.classList.toggle(selectedButtonClass, this.properties.capsLock);
             });
             break;
           case 9:
           case 32:
-            btn.textContent = button.en;
             btn.addEventListener('click', () => {
               this.elements.textarea.value += button.code === 9 ? '   ' : ' ';
             });
             break;
           default:
-            if (this.constants.letterCodes.includes(button.code)) {
-              btn.textContent = this.properties.currentLang === this.constants.en
-                ? button.en : button.ru;
-            } else {
-              btn.textContent = button.en;
+            if (!this.constants.controlCodes.includes(button.code)) {
+              if (this.properties.capsLock) {
+                btn.textContent = this.isEng() ? button.shift.en : button.shift.ru;
+              } else {
+                btn.textContent = this.isEng() ? button.simple.en : button.simple.ru;
+              }
             }
 
-            btn.setAttribute('data-en', button.en);
-            btn.setAttribute('data-ru', button.ru);
+            btn.setAttribute('data-simple-en', button.simple.en);
+            btn.setAttribute('data-simple-ru', button.simple.ru);
+            btn.setAttribute('data-shift-en', button.shift.en);
+            btn.setAttribute('data-shift-ru', button.shift.ru);
 
             btn.addEventListener('click', () => {
-              let code = button.en;
-              if (this.constants.letterCodes.includes(button.code)) {
-                code = this.properties.currentLang === this.constants.en
-                  ? button.en : button.ru;
+              let code = button.simple.en;
+              if (!this.constants.controlCodes.includes(button.code)) {
+                if (this.properties.capsLock) {
+                  code = this.isEng() ? btn.dataset.shiftEn : btn.dataset.shiftRu;
+                } else {
+                  code = this.isEng() ? btn.dataset.simpleEn : btn.dataset.simpleRu;
+                }
               }
-
-              this.elements.textarea.value += this.properties.capsLock
-                ? code.toUpperCase() : code.toLowerCase();
+              this.elements.textarea.value += code;
             });
             break;
         }
@@ -137,17 +139,17 @@ const keyboard = {
   },
 
   changeLang() {
-    this.properties.currentLang = this.properties.currentLang === this.constants.en
-      ? this.constants.ru : this.constants.en;
+    this.properties.currentLang = this.isEng() ? this.constants.ru : this.constants.en;
     localStorage.setItem('lang', this.properties.currentLang);
 
     this.elements.keys.forEach((key) => {
       const btn = key;
-      if (this.constants.letterCodes.includes(+btn.id)) {
-        const code = this.properties.currentLang === this.constants.en
-          ? btn.dataset.en : btn.dataset.ru;
-        btn.textContent = this.properties.capsLock
-          ? code.toUpperCase() : code.toLowerCase();
+      if (!this.constants.controlCodes.includes(+btn.id)) {
+        if (this.properties.capsLock) {
+          btn.textContent = this.isEng() ? btn.dataset.shiftEn : btn.dataset.shiftRu;
+        } else {
+          btn.textContent = this.isEng() ? btn.dataset.simpleEn : btn.dataset.simpleRu;
+        }
       }
     });
   },
@@ -155,32 +157,38 @@ const keyboard = {
   toggleCapsLock() {
     this.properties.capsLock = !this.properties.capsLock;
     const controlButtons = [8, 9, 20, 16, 17, 18, 13, 32, 0];
-
     this.elements.keys.forEach((key) => {
       if (!controlButtons.includes(+key.id)) {
         const btn = key;
-        btn.textContent = this.properties.capsLock
-          ? btn.textContent.toUpperCase()
-          : btn.textContent.toLowerCase();
+        if (this.properties.capsLock) {
+          btn.textContent = this.isEng() ? btn.dataset.shiftEn : btn.dataset.shiftRu;
+        } else {
+          btn.textContent = this.isEng() ? btn.dataset.simpleEn : btn.dataset.simpleRu;
+        }
       }
     });
   },
-};
 
-const selectedButtonClass = 'keyboard__button--active';
+  isEng() {
+    return this.properties.currentLang === this.constants.en;
+  },
+};
 
 const keyUpEvent = (event) => {
   const button = document.getElementById(event.keyCode);
-  if (button) {
+  if (button && event.keyCode !== 20) {
     button.classList.remove(selectedButtonClass);
-    button.click();
   }
 };
 
 const keyDownEvent = (event) => {
   const button = document.getElementById(event.keyCode);
-  if (!!button && !button.classList.contains(selectedButtonClass)) {
-    button.classList.add(selectedButtonClass);
+  if (button) {
+    button.click();
+
+    if (!button.classList.contains(selectedButtonClass) && event.keyCode !== 20) {
+      button.classList.add(selectedButtonClass);
+    }
   }
 };
 
