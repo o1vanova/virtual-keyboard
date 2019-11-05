@@ -63,7 +63,7 @@ const data = [
     { code: 17, name: 'Ctrl' },
     { code: 18, name: 'Alt' },
     { code: 32, name: 'Space' },
-    { code: 0, name: 'Lang' },
+    { code: 0, en: 'RU', ru: 'EN' },
   ],
 ];
 
